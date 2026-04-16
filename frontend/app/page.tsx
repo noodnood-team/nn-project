@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { UploadCloud, Camera, Flame, Activity, AlertTriangle, RefreshCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -24,7 +24,16 @@ export default function NutritionApp() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [results, setResults] = useState<AnalyzeResponse | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [sheetHeight, setSheetHeight] = useState(500);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (sheetRef.current) {
+      setSheetHeight(sheetRef.current.offsetHeight);
+    }
+  }, [results, status]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -50,6 +59,7 @@ export default function NutritionApp() {
     setImageFile(file);
     setImagePreview(previewUrl);
     setStatus("ANALYZING");
+    setIsCollapsed(false);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -83,6 +93,7 @@ export default function NutritionApp() {
     if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
     setResults(null);
+    setIsCollapsed(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -190,13 +201,32 @@ export default function NutritionApp() {
       <AnimatePresence>
         {(status === "SUCCESS" || status === "ERROR") && results && (
           <motion.div 
+            ref={sheetRef}
             initial={{ y: "100%" }}
-            animate={{ y: 0 }}
+            animate={{ y: isCollapsed ? Math.max(0, sheetHeight - 96) : 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="absolute z-30 bottom-0 left-0 right-0 bg-[#f2ead6] rounded-t-[40px] border-t-8 border-l-8 border-r-8 border-[#13202e] shadow-[0_-10px_30px_rgba(0,0,0,0.5)] p-8 overflow-y-auto max-h-[85vh]"
+            drag="y"
+            dragConstraints={{ top: 0 }}
+            dragElastic={0}
+            dragMomentum={false}
+            onDragEnd={(e, info) => {
+              // Only consider significant movement to trigger state change
+              const threshold = 50;
+              const isFast = Math.abs(info.velocity.y) > 400;
+              
+              if (info.offset.y > threshold || (isFast && info.velocity.y > 0)) {
+                setIsCollapsed(true);
+              } else if (info.offset.y < -threshold || (isFast && info.velocity.y < 0)) {
+                setIsCollapsed(false);
+              }
+            }}
+            className="absolute z-30 bottom-0 left-0 right-0 mx-auto w-full max-w-md bg-[#f2ead6] rounded-t-[40px] border-t-8 border-l-8 border-r-8 border-[#13202e] shadow-[0_-10px_30px_rgba(0,0,0,0.5)] p-8 max-h-[85vh] touch-none"
           >
-            <div className="w-16 h-2 bg-[#13202e] rounded-full mx-auto mb-8 opacity-50" />
+            <motion.div 
+              className="w-16 h-2 bg-[#13202e] rounded-full mx-auto mb-8 opacity-50 cursor-pointer active:scale-110 transition-transform hover:opacity-100" 
+              onTap={() => setIsCollapsed(!isCollapsed)}
+            />
             
             {status === "SUCCESS" && results.prediction && (
               <div className="flex flex-col h-full space-y-6">
