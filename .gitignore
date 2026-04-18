@@ -1,0 +1,6 @@
+.env
+__pycache__/
+artifacts/
+prediction.ipynb
+resnet_model.pth
+test_image.jpg
