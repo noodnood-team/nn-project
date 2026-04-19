@@ -207,8 +207,8 @@ export default function NutritionApp() {
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             drag="y"
-            dragConstraints={{ top: 0 }}
-            dragElastic={0}
+            dragConstraints={{ top: 0, bottom: Math.max(0, sheetHeight - 96) }}
+            dragElastic={{ top: 0, bottom: 0.2 }}
             dragMomentum={false}
             onDragEnd={(e, info) => {
               // Only consider significant movement to trigger state change
