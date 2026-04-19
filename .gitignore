@@ -1,0 +1,17 @@
+# AI agent / assistant tooling (vendor-specific; keep local)
+.agents/
+.claude/
+.codex/
+.cursor/
+.gemini/
+.serena/
+
+# Agent instruction files (repo root or app folders, e.g. create-next-app --agents-md)
+**/AGENTS.md
+**/CLAUDE.md
+**/GEMINI.md
+**/COPILOT.md
+
+# Optional local Cursor project rules at repo root
+.cursorrules
+.cursorignore
