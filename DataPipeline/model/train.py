@@ -1,8 +1,16 @@
 def train(model, train_loader, criterion, optimizer, device):
     from clearml import Task
+    import torch
     logger = Task.current_task().get_logger()
     
-    for epoch in range(5):
+    patience=10
+    min_delta=0.001 
+
+    # Initialize early stopping parameters
+    best_loss = float('inf')
+    epochs_no_improve = 0
+
+    for epoch in range(50):
         model.train()
         total_loss = 0
 
@@ -27,5 +35,17 @@ def train(model, train_loader, criterion, optimizer, device):
         )
 
         print(f"Epoch {epoch+1}, Loss: {avg_loss:.4f}")
+
+        # Early stopping check
+        if avg_loss < best_loss - min_delta:
+            best_loss = avg_loss
+            epochs_no_improve = 0
+            torch.save(model.state_dict(), 'best_Resnet18_model.pth')
+        else:
+            epochs_no_improve += 1
+
+        if epochs_no_improve >= patience:
+            print(f"Early stopping triggered after {epoch+1} epochs: no improvement for {patience} epochs.")
+            break
 
     return None

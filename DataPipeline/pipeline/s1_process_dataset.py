@@ -1,6 +1,6 @@
 def step_preprocess():
-    from data.loader import load_data
-    from data.preprocessing import preprocessing
+    from DataPipeline.data.loader import load_data
+    from DataPipeline.data.preprocessing import preprocessing
     from clearml import Task
     import os
     import pandas as pd

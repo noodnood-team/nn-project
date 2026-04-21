@@ -1,11 +1,11 @@
 def step_train(feature_path):
     import logging
     import pandas as pd
-    from data.split import split_data
-    from data.create_dataloader import create_dataloader
-    from model.train import train
-    from model.model import resnet_model, get_training_components
-    from model.save_model import save_model
+    from DataPipeline.data.split import split_data
+    from DataPipeline.data.create_dataloader import create_dataloader
+    from DataPipeline.model.train import train
+    from DataPipeline.model.model import resnet_model, get_training_components
+    from DataPipeline.model.save_model import save_model
     import os
 
     # Set up logging

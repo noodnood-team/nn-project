@@ -1,7 +1,7 @@
 def create_dataloader(train_df, test_df):
     import torchvision.transforms as transforms
     from torch.utils.data import DataLoader
-    from data.dataset import FoodDataset
+    from DataPipeline.data.dataset import FoodDataset
     
     train_transform = transforms.Compose([
         transforms.Resize((224, 224)), 

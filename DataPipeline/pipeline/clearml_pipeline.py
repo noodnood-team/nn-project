@@ -1,8 +1,13 @@
+'''
+ This code defines a ClearML pipeline for a machine learning project.
+ This script is for MLOps level 1.
+'''
+
 from clearml.automation import PipelineController
-from pipeline.s1_process_dataset import step_preprocess
-from pipeline.s2_feature_engineering import step_feature
-from pipeline.s3_train_model import step_train
-from pipeline.s4_evaluate_model import step_evaluate
+from DataPipeline.pipeline.s1_process_dataset import step_preprocess
+from DataPipeline.pipeline.s2_feature_engineering import step_feature
+from DataPipeline.pipeline.s3_train_model import step_train
+from DataPipeline.pipeline.s4_evaluate_model import step_evaluate
 
 import dotenv 
 import os
@@ -64,4 +69,5 @@ pipe.add_function_step(
     execution_queue="default"
 )
 
-pipe.start_locally(run_pipeline_steps_locally=True)
+# pipe.start_locally(run_pipeline_steps_locally=True)
+pipe.start(queue="default")

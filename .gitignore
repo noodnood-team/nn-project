@@ -2,5 +2,5 @@
 __pycache__/
 artifacts/
 prediction.ipynb
-resnet_model.pth
+*.pth
 test_image.jpg

@@ -2,10 +2,10 @@ def step_evaluate(model_path, feature_path):
     import torch
     import pandas as pd
 
-    from data.split import split_data
-    from data.create_dataloader import create_dataloader
-    from model.model import resnet_model
-    from model.evaluation import eval
+    from DataPipeline.data.split import split_data
+    from DataPipeline.data.create_dataloader import create_dataloader
+    from DataPipeline.model.model import resnet_model
+    from DataPipeline.model.evaluation import eval
 
     from clearml import Task
 

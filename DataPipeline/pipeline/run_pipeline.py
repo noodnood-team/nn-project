@@ -1,13 +1,29 @@
-from data.loader import load_data
-from data.preprocessing import preprocessing
-from data.feature_engineering import feature_engineering
-from data.split import split_data
-from data.create_dataloader import create_dataloader
+'''
+This script runs the entire pipeline for the Nutrition Analyser project. It includes the following steps:
+1. Load the dataset using ClearML and get the path of the dataset on the local machine.
+2. Preprocess the dataset and get a dataframe.
+3. Perform feature engineering and get a dataframe.
+4. Split the dataframe into train and test sets.
+5. Create dataloaders for train and test sets.
+6. Create the model and device.
+7. Get the criterion and optimizer for training the model.
+8. Train the model.
+9. Evaluate the model on the test set.
+10. Save the trained model.
 
-from model.model import resnet_model, get_training_components
-from model.train import train
-from model.evaluation import eval
-from model.save_model import save_model
+This is for MLOps level 0, where we run the entire pipeline in a single script.
+'''
+
+from DataPipeline.data.loader import load_data
+from DataPipeline.data.preprocessing import preprocessing
+from DataPipeline.data.feature_engineering import feature_engineering
+from DataPipeline.data.split import split_data
+from DataPipeline.data.create_dataloader import create_dataloader
+
+from DataPipeline.model.model import resnet_model, get_training_components
+from DataPipeline.model.train import train
+from DataPipeline.model.evaluation import eval
+from DataPipeline.model.save_model import save_model
 
 import os
 import dotenv 

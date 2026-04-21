@@ -1,5 +1,5 @@
 def step_feature(processed_path):
-    from data.feature_engineering import feature_engineering
+    from DataPipeline.data.feature_engineering import feature_engineering
     import pandas as pd
     import os
     import logging

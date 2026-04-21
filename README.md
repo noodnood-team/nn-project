@@ -1,3 +1,3 @@
 # nn-project
-
-use py -m pipeline.run_pipeline to run the pipeline
+ 
+# At the root directory, run 'py -m DataPipeline.pipeline.clearml_pipeline' to start the pipeline.
