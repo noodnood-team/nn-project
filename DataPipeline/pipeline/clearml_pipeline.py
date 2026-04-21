@@ -3,14 +3,21 @@
  This script is for MLOps level 1.
 '''
 
+print("Starting ClearML pipeline...")
+import sys
+import dotenv 
+import os
+
+# Get the current path of the cmd
+system_path = os.getcwd()
+sys.path.append(system_path)
+
 from clearml.automation import PipelineController
 from DataPipeline.pipeline.s1_process_dataset import step_preprocess
 from DataPipeline.pipeline.s2_feature_engineering import step_feature
 from DataPipeline.pipeline.s3_train_model import step_train
 from DataPipeline.pipeline.s4_evaluate_model import step_evaluate
 
-import dotenv 
-import os
 dotenv.load_dotenv()
 
 from clearml import Task

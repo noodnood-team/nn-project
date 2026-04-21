@@ -1,8 +1,13 @@
 def step_preprocess():
+    import os
+    import sys
+    # Get the current path of the cmd
+    system_path = os.getcwd()
+    sys.path.append(system_path)
+
     from DataPipeline.data.loader import load_data
     from DataPipeline.data.preprocessing import preprocessing
     from clearml import Task
-    import os
     import pandas as pd
     import logging
 

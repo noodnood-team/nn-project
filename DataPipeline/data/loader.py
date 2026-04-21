@@ -13,8 +13,10 @@ def load_data():
             dataset_project="NutritionAnalyser"
         )
 
+        print("start loading dataset from ClearML...")
         local_path = ds.get_local_copy()
         logger.info(f"Loaded raw dataset: {ds.name}")
+        print("finished loading dataset from ClearML.")
         return local_path
 
     except Exception as e:

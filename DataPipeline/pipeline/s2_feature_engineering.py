@@ -1,7 +1,12 @@
 def step_feature(processed_path):
+    import os
+    import sys
+    # Get the current path of the cmd
+    system_path = os.getcwd()
+    sys.path.append(system_path)
+
     from DataPipeline.data.feature_engineering import feature_engineering
     import pandas as pd
-    import os
     import logging
 
     # Set up logging

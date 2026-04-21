@@ -1,4 +1,10 @@
 def step_train(feature_path):
+    import os
+    import sys
+    # Get the current path of the cmd
+    system_path = os.getcwd()
+    sys.path.append(system_path)
+    
     import logging
     import pandas as pd
     from DataPipeline.data.split import split_data
@@ -6,7 +12,6 @@ def step_train(feature_path):
     from DataPipeline.model.train import train
     from DataPipeline.model.model import resnet_model, get_training_components
     from DataPipeline.model.save_model import save_model
-    import os
 
     # Set up logging
     logging.basicConfig(level=logging.INFO)

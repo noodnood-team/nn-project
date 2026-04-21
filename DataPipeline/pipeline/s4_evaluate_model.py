@@ -1,4 +1,10 @@
 def step_evaluate(model_path, feature_path):
+    import os
+    import sys
+    # Get the current path of the cmd
+    system_path = os.getcwd()
+    sys.path.append(system_path)
+    
     import torch
     import pandas as pd
 
