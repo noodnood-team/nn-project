@@ -7,8 +7,6 @@ def step_preprocess():
 
     from DataPipeline.data.loader import load_data
     from DataPipeline.data.preprocessing import preprocessing
-    from clearml import Task
-    import pandas as pd
     import logging
 
     # Set up logging
