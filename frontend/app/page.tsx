@@ -316,7 +316,7 @@ export default function NutritionApp() {
                 </div>
                 
                 <div>
-                  <h3 className="text-3xl font-black uppercase text-[#13202e] mb-3">Analysis Failed</h3>
+                  <h3 className="text-3xl font-black uppercase text-[#13202e] mb-3">No Food Detected</h3>
                   <p className="text-[#3c556b] font-bold text-base leading-relaxed max-w-[280px] mx-auto">
                     {results.message || "We encountered an issue processing your image."}
                   </p>
