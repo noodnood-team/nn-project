@@ -1,39 +1,76 @@
 from flask import Flask, request, jsonify
 import torch
-from DataPipeline.model.model import resnet_model  # แก้ตาม model ของคุณ
 from PIL import Image
-import torchvision.transforms as transforms
+import numpy as np
+import os
+from torchvision import transforms
+import torch
+from torchvision import models
 
+# Initialize Flask app
 app = Flask(__name__)
 
-# โหลด model
-model = resnet_model()
-model.load_state_dict(torch.load("artifacts/model/model.pth"))
-model.eval()
+# load the model and set it to evaluation mode
+model = models.resnet18(pretrained=False)  # load the ResNet-18 architecture without pretrained weights
+model.fc = torch.nn.Linear(model.fc.in_features, 4) # 4 is the number of classes in your dataset (total_calories, carbohydrates, protein, fat)
+state_dict = torch.load("model.pth", map_location="cuda" if torch.cuda.is_available() else "cpu")
+model.load_state_dict(state_dict)
+model.eval() 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
 
-# การแปลงภาพให้เหมาะสมกับ model
+# create uploads directory if it doesn't exist
+if not os.path.exists('uploads'):
+    os.makedirs('uploads')
+
+# make sure to use the same transformations as during training
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406], 
+        std=[0.229, 0.224, 0.225]),
 ])
 
-@app.route("/predict", methods=["POST"])
-def predict():
+# Function to predict calories from an image
+def predict(image_path, model):
+    
+    # load and preprocess the image
+    img = Image.open(image_path).convert("RGB")
+    img_tensor = transform(img).unsqueeze(0).to(device)  # เพิ่ม batch dimension
+    
+    # predict calories
+    with torch.no_grad():
+        output = model(img_tensor)
+        calories = np.expm1(output.cpu().numpy()[0])
+    
+    return calories
+
+# Route for handling prediction requests
+@app.route('/predict', methods=['POST'])
+def get_prediction():
     try:
-        # รับข้อมูลจาก request (คาดว่าจะเป็นรูป)
-        img_file = request.files["image"]
-        img = Image.open(img_file.stream).convert("RGB")
-        img = transform(img).unsqueeze(0)
+        # receive the image file from the request
+        image_file = request.files['image']
+        image_path = os.path.join('uploads', image_file.filename)
+        image_file.save(image_path)
 
-        # ใช้ model ทำนาย
-        with torch.no_grad():
-            outputs = model(img)
-            _, predicted = torch.max(outputs, 1)
+        # predict calories using the model
+        predicted_calories = predict(image_path, model)
+        result = {
+            'total_calories': float(predicted_calories[0]),
+            'protein': float(predicted_calories[1]),
+            'carbohydrates': float(predicted_calories[2]),
+            'fat': float(predicted_calories[3])
+        }
+        # remove the uploaded image after prediction
+        os.remove(image_path)
+        # return the prediction result as JSON
+        return jsonify(result)
 
-        return jsonify({"prediction": predicted.item()})
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({'error': str(e)}), 400
 
-if __name__ == "__main__":
+# Run the Flask server
+if __name__ == '__main__':
     app.run(debug=True, host="127.0.0.1", port=5000)

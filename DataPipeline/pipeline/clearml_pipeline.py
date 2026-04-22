@@ -76,5 +76,5 @@ pipe.add_function_step(
     execution_queue="default"
 )
 
-# pipe.start_locally(run_pipeline_steps_locally=True)
-pipe.start(queue="default")
+pipe.start_locally(run_pipeline_steps_locally=True)
+# pipe.start(queue="default")
