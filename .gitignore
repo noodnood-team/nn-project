@@ -1,3 +1,7 @@
+# Environment variables
+.env
+.env.*
+
 # AI agent / assistant tooling (vendor-specific; keep local)
 .agents/
 .claude/

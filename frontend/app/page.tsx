@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { UploadCloud, Camera, Flame, Activity, AlertTriangle, RefreshCcw } from "lucide-react";
+import { UploadCloud, Camera, Flame, Activity, AlertTriangle, RefreshCcw, ImageOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type AppState = "IDLE" | "ANALYZING" | "SUCCESS" | "ERROR";
+type AppState = "IDLE" | "ANALYZING" | "SUCCESS" | "NO_FOOD" | "ERROR";
 
 interface Macros {
   calories: number;
@@ -17,6 +17,18 @@ interface AnalyzeResponse {
   ok: boolean;
   prediction?: Macros | null;
   message?: string;
+}
+
+/** Backend: ok: false, prediction: null when the image is not recognized as a meal. */
+function isNoFoodResponse(data: AnalyzeResponse): boolean {
+  if (data.ok || data.prediction != null) return false;
+  const m = (data.message ?? "").toLowerCase();
+  return (
+    m.includes("could not detect food") ||
+    m.includes("could not detect any food") ||
+    m.includes("doesn't look like a food") ||
+    m.includes("don't look like a food")
+  );
 }
 
 export default function NutritionApp() {
@@ -65,16 +77,18 @@ export default function NutritionApp() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/v1/predict", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/predict`, {
         method: "POST",
         body: formData,
       });
 
       const data: AnalyzeResponse = await response.json();
       setResults(data);
-      
-      if (response.ok && data.ok) {
+
+      if (data.ok && data.prediction) {
         setStatus("SUCCESS");
+      } else if (isNoFoodResponse(data)) {
+        setStatus("NO_FOOD");
       } else {
         setStatus("ERROR");
       }
@@ -199,7 +213,7 @@ export default function NutritionApp() {
 
       {/* SUCCESS OR ERROR STATE: Bottom Sheet */}
       <AnimatePresence>
-        {(status === "SUCCESS" || status === "ERROR") && results && (
+        {(status === "SUCCESS" || status === "NO_FOOD" || status === "ERROR") && results && (
           <motion.div 
             ref={sheetRef}
             initial={{ y: "100%" }}
@@ -267,6 +281,30 @@ export default function NutritionApp() {
                 >
                   <Camera size={20} strokeWidth={3} />
                   Pump Up Again
+                </button>
+              </div>
+            )}
+
+            {status === "NO_FOOD" && (
+              <div className="flex flex-col h-full space-y-6 text-center py-4">
+                <div className="w-24 h-24 bg-[#61859b] text-[#f2ead6] rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-[#13202e] shadow-[4px_4px_0px_#13202e]">
+                  <ImageOff size={48} strokeWidth={2.5} aria-hidden />
+                </div>
+
+                <div>
+                  <h3 className="text-3xl font-black uppercase text-[#13202e] mb-3">No meal detected</h3>
+                  <p className="text-[#3c556b] font-bold text-base leading-relaxed max-w-[280px] mx-auto">
+                    {results.message ||
+                      "We could not find food in this image. Try a clearer photo of your meal."}
+                  </p>
+                </div>
+
+                <button
+                  onClick={resetApp}
+                  className="w-full bg-[#13202e] text-[#f2ead6] font-black uppercase tracking-wider py-5 rounded-xl flex items-center justify-center gap-2 mt-6 hover:bg-black transition-colors border-2 border-[#13202e] shadow-[4px_4px_0px_#13202e] active:shadow-none active:translate-y-1 active:translate-x-1"
+                >
+                  <Camera size={20} strokeWidth={3} />
+                  Try another photo
                 </button>
               </div>
             )}

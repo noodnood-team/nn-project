@@ -18,7 +18,8 @@ export async function POST(req: Request) {
       return NextResponse.json({
         ok: false,
         prediction: null,
-        message: "This doesn't look like a food image. Please upload a photo of a meal."
+        message:
+          'I could not detect food in this image. Please try again with a clearer meal photo.',
       });
     }
 
