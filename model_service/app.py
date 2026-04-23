@@ -9,6 +9,7 @@ from torchvision import models
 
 # Initialize Flask app
 app = Flask(__name__)
+app.json.sort_keys = False
 
 # load the model and set it to evaluation mode
 model = models.resnet18(pretrained=False)  # load the ResNet-18 architecture without pretrained weights
@@ -46,9 +47,31 @@ def predict(image_path, model):
     
     return calories
 
+#Middlewares
+# @app.before_request
+# def limit_remote_addr():
+#     if request.remote_addr != ALLOWED_IP:
+#         print(f"Unauthorized access attempt from IP: {request.remote_addr}")
+#         return jsonify({'error': 'Unauthorized access'}), 403
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    print(f"Health check request received from IP: {client_ip}")
+    return jsonify({'status': 'ok'})
+
 # Route for handling prediction requests
 @app.route('/predict', methods=['POST'])
 def get_prediction():
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    print(f"Prediction request received from IP: {client_ip}")
     try:
         # receive the image file from the request
         image_file = request.files['image']
@@ -58,9 +81,9 @@ def get_prediction():
         # predict calories using the model
         predicted_calories = predict(image_path, model)
         result = {
-            'total_calories': float(predicted_calories[0]),
+            'calories': float(predicted_calories[0]),
             'protein': float(predicted_calories[1]),
-            'carbohydrates': float(predicted_calories[2]),
+            'carbs': float(predicted_calories[2]),
             'fat': float(predicted_calories[3])
         }
         # remove the uploaded image after prediction
@@ -69,8 +92,9 @@ def get_prediction():
         return jsonify(result)
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 400
-
 # Run the Flask server
 if __name__ == '__main__':
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)

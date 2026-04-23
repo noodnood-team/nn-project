@@ -4,3 +4,4 @@ artifacts/
 prediction.ipynb
 *.pth
 test_image.jpg
+uploads/

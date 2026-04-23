@@ -4,10 +4,6 @@ def resnet_model():
     import torch
 
     model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-    # for param in model.parameters():
-    #     param.requires_grad = False
-    # model.fc.requires_grad = True
-    # model = models.resnet18(pretrained=True)
     model.fc = nn.Linear(model.fc.in_features, 4)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
