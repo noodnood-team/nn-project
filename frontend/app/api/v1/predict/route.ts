@@ -9,8 +9,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: 'No file uploaded.' }, { status: 400 });
     }
 
-    // Artificial delay for UI testing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (process.env.NODE_ENV === "development") {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
     
     const fileName = file.name.toLowerCase();
     
