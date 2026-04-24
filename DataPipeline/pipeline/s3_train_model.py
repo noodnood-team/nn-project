@@ -24,14 +24,17 @@ def main():
     logger = logging.getLogger(__name__)
 
     params = {
-        "feature_path": "",
+        "feature_path": "artifacts/featured/data.pkl",
         "model_path": "artifacts/model/model.pth",
     }
     params = task.connect(params)
 
+    feature_path = params.get("feature_path") or "artifacts/featured/data.pkl"
+    model_path = params.get("model_path") or "artifacts/model/model.pth"
+
     logger.info("Training step started")
 
-    df = pd.read_pickle(params["feature_path"])
+    df = pd.read_pickle(feature_path)
 
     train_df, test_df = split_data(df)
     train_loader, test_loader = create_dataloader(train_df, test_df)
@@ -41,14 +44,13 @@ def main():
 
     train(model, train_loader, criterion, optimizer, device)
 
-    os.makedirs(os.path.dirname(params["model_path"]), exist_ok=True)
-    save_model(model, params["model_path"])
+    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+    save_model(model, model_path)
 
     task.upload_artifact(
         name="trained_model",
-        artifact_object=params["model_path"]
+        artifact_object=model_path
     )
-
     logger.info("Training step completed")
 
 

@@ -20,14 +20,15 @@ def main():
     logger = logging.getLogger(__name__)
 
     params = {
-        "processed_path": "",
+        "processed_path": "artifacts/processed/data.pkl",
         "output_path": "artifacts/featured/data.pkl",
     }
     params = task.connect(params)
 
     logger.info("Feature engineering step started")
 
-    df = pd.read_pickle(params["processed_path"])
+    processed_path = params.get("processed_path") or "artifacts/processed/data.pkl"
+    df = pd.read_pickle(processed_path)
     df = feature_engineering(df)
 
     os.makedirs(os.path.dirname(params["output_path"]), exist_ok=True)
