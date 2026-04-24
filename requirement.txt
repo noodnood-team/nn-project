@@ -6,3 +6,5 @@ clearml
 scikit-learn
 pandas
 numpy
+pyarrow
+fastparquet

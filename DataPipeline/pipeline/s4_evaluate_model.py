@@ -1,35 +1,57 @@
-def step_evaluate(model_path, feature_path):
-    import os
-    import sys
-    # Get the current path of the cmd
-    system_path = os.getcwd()
-    sys.path.append(system_path)
-    
-    import torch
-    import pandas as pd
+from clearml import Task
+import logging
+import pandas as pd
+import torch
+import os
+import sys
 
-    from DataPipeline.data.split import split_data
-    from DataPipeline.data.create_dataloader import create_dataloader
-    from DataPipeline.model.model import resnet_model
-    from DataPipeline.model.evaluation import eval
+system_path = os.getcwd()
+sys.path.append(system_path)
 
-    from clearml import Task
+from DataPipeline.data.split import split_data
+from DataPipeline.data.create_dataloader import create_dataloader
+from DataPipeline.model.model import resnet_model
+from DataPipeline.model.evaluation import eval
 
-    logger = Task.current_task().get_logger()
+def main():
+    task = Task.init(
+        project_name="NutritionAnalyser",
+        task_name="step_evaluate_base",
+        task_type=Task.TaskTypes.testing,
+    )
 
-    df = pd.read_parquet(feature_path)
+    logging.basicConfig(level=logging.INFO, force=True)
+    logger = logging.getLogger(__name__)
+
+    params = {
+        "feature_path": "",
+        "model_path": "",
+    }
+    params = task.connect(params)
+
+    logger.info("Evaluation step started")
+
+    df = pd.read_pickle(params["feature_path"])
 
     train_df, test_df = split_data(df)
     _, test_loader = create_dataloader(train_df, test_df)
 
-
     model, device = resnet_model()
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.load_state_dict(torch.load(params["model_path"], map_location=device))
     model.to(device)
 
     criterion = torch.nn.MSELoss()
-
-
     val_loss = eval(test_loader, model, criterion, device)
 
-    return val_loss
+    task.get_logger().report_scalar(
+        "metrics",
+        "val_loss",
+        iteration=0,
+        value=float(val_loss)
+    )
+
+    logger.info(f"Validation loss = {val_loss}")
+
+
+if __name__ == "__main__":
+    main()
