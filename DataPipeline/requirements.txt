@@ -1,0 +1,10 @@
+flask
+torch
+torchvision
+Pillow
+clearml
+scikit-learn
+pandas
+numpy
+pyarrow
+fastparquet
