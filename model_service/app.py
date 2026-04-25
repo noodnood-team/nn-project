@@ -7,6 +7,8 @@ from torchvision import transforms
 import torch
 from torchvision import models
 
+from load_model import load_model_from_clearml
+
 # Initialize Flask app
 app = Flask(__name__)
 app.json.sort_keys = False
@@ -14,11 +16,8 @@ app.json.sort_keys = False
 # load the model and set it to evaluation mode
 model = models.resnet18(pretrained=False)  # load the ResNet-18 architecture without pretrained weights
 model.fc = torch.nn.Linear(model.fc.in_features, 4) # 4 is the number of classes in your dataset (total_calories, carbohydrates, protein, fat)
-state_dict = torch.load("model.pth", map_location="cuda" if torch.cuda.is_available() else "cpu")
-model.load_state_dict(state_dict)
-model.eval() 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = model.to(device)
+TRAIN_TASK_ID = "b0645be8f78d4b0da04614ea7a26e371" # replace with your actual ClearML task ID
+model, device = load_model_from_clearml(TRAIN_TASK_ID)
 
 # create uploads directory if it doesn't exist
 if not os.path.exists('uploads'):
@@ -46,13 +45,6 @@ def predict(image_path, model):
         calories = np.expm1(output.cpu().numpy()[0])
     
     return calories
-
-#Middlewares
-# @app.before_request
-# def limit_remote_addr():
-#     if request.remote_addr != ALLOWED_IP:
-#         print(f"Unauthorized access attempt from IP: {request.remote_addr}")
-#         return jsonify({'error': 'Unauthorized access'}), 403
 
 @app.after_request
 def add_cors_headers(response):

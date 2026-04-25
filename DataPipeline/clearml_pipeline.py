@@ -55,7 +55,7 @@ pipe.add_step(
         "General/train_task_id": "${s2_train_model.id}",
         "General/batch_size": 32
     }
-) 
+)
 
 # Start the pipeline locally but tasks will run on queue
 logger.info("Starting pipeline locally with tasks on queue: default")

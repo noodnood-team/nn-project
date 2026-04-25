@@ -1,9 +1,2 @@
-.env
 __pycache__/
 artifacts/
-prediction.ipynb
-*.pth
-test_image.jpg
-uploads/
-run.ipynb
-/dataset
