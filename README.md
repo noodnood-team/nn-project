@@ -42,8 +42,9 @@ nn-project/
 ├── run.ipynb
 ├── requirement.txt
 └── README.md
+```
 
-## Getting Started
+## Project Overview
 
 ### 1. How to Run Data Pipeline
 
