@@ -52,14 +52,16 @@ def main():
 
     task.upload_artifact(
         name="evaluation_result",
-        artifact_object={"mse_loss": float(evaluation_result["mse_loss"]), 
-                         "mae": float(evaluation_result["mae"]), 
-                         "rmse": float(evaluation_result["rmse"])}
+        artifact_object={"mse_log_loss": float(evaluation_result["mse_log_loss"]), 
+                         "mse_real": float(evaluation_result["mse_real"]),
+                         "mae_real": float(evaluation_result["mae_real"]), 
+                         "rmse_real": float(evaluation_result["rmse_real"])}
     )
 
-    logger.info(f"MSE = {evaluation_result['mse_loss']}")
-    logger.info(f"MAE = {evaluation_result['mae']}")
-    logger.info(f"RMSE = {evaluation_result['rmse']}")
+    logger.info(f"MSE (log loss) = {evaluation_result['mse_log_loss']}")
+    logger.info(f"MSE (real) = {evaluation_result['mse_real']}")
+    logger.info(f"MAE = {evaluation_result['mae_real']}")
+    logger.info(f"RMSE = {evaluation_result['rmse_real']}")
     logger.info("s3_evaluate_model completed.")
 
 if __name__ == "__main__":

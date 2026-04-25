@@ -113,21 +113,25 @@ def eval(test_loader, model, criterion, device):
     y_pred = np.expm1(y_pred)
     y_true = np.expm1(y_true)
 
-    # calculate MAE and RMSE
+    # calculate metrics
+    mse = mean_squared_error(y_true, y_pred)
     mae = mean_absolute_error(y_true, y_pred)
     rmse = mean_squared_error(y_true, y_pred) ** 0.5
 
     print("Validation Loss:", avg_loss)
+    print("MSE:", mse)
     print("MAE:", mae)
     print("RMSE:", rmse)
 
     # report metrics to ClearML logger
-    logger.report_scalar("metrics", "mse_loss", value=float(avg_loss), iteration=0)
-    logger.report_scalar("metrics", "mae", value=float(mae), iteration=0)
-    logger.report_scalar("metrics", "rmse", value=float(rmse), iteration=0)
+    logger.report_scalar("metrics", "mse_log_loss", value=float(avg_loss), iteration=0)
+    logger.report_scalar("metrics", "mse_real", value=float(mse), iteration=0)
+    logger.report_scalar("metrics", "mae_real", value=float(mae), iteration=0)
+    logger.report_scalar("metrics", "rmse_real", value=float(rmse), iteration=0)
 
     return {
-        "mse_loss": float(avg_loss),
-        "mae": float(mae),
-        "rmse": float(rmse)
+    "mse_log_loss": float(avg_loss),
+    "mse_real": float(mse),
+    "mae_real": float(mae),
+    "rmse_real": float(rmse)
     }
