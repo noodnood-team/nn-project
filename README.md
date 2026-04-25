@@ -119,12 +119,13 @@ To run the Flask API for model inference:
 2. Install dependencies:
    ```bash
    pip install -r requirements.txt
-```
+   ```
 
 3. Start the Flask app:
     ```bash
     python app.py
     ```
+
 The API will be available at `http://localhost:5000`.
 API Endpoint:
 - `POST /predict`: Accepts an image file and returns predicted nutrition values.
