@@ -105,33 +105,57 @@ def eval(test_loader, model, criterion, device):
 
     avg_loss = val_loss / len(test_loader)
 
-    # concatenate all outputs and labels
     y_pred = np.vstack(all_outputs)
     y_true = np.vstack(all_labels)
 
-    # reverse log transformation
+    # Reverse log transformation
     y_pred = np.expm1(y_pred)
     y_true = np.expm1(y_true)
 
-    # calculate metrics
-    mse = mean_squared_error(y_true, y_pred)
-    mae = mean_absolute_error(y_true, y_pred)
-    rmse = mean_squared_error(y_true, y_pred) ** 0.5
+    target_names = ["calories", "protein", "carbs", "fat"]
 
-    print("Validation Loss:", avg_loss)
-    print("MSE:", mse)
-    print("MAE:", mae)
-    print("RMSE:", rmse)
-
-    # report metrics to ClearML logger
-    logger.report_scalar("metrics", "mse_log_loss", value=float(avg_loss), iteration=0)
-    logger.report_scalar("metrics", "mse_real", value=float(mse), iteration=0)
-    logger.report_scalar("metrics", "mae_real", value=float(mae), iteration=0)
-    logger.report_scalar("metrics", "rmse_real", value=float(rmse), iteration=0)
-
-    return {
-    "mse_log_loss": float(avg_loss),
-    "mse_real": float(mse),
-    "mae_real": float(mae),
-    "rmse_real": float(rmse)
+    metrics = {
+        "mse_log_loss": float(avg_loss)
     }
+
+    # Overall metrics
+    mse_real = mean_squared_error(y_true, y_pred)
+    mae_real = mean_absolute_error(y_true, y_pred)
+    rmse_real = mse_real ** 0.5
+
+    metrics["overall_mse"] = float(mse_real)
+    metrics["overall_mae"] = float(mae_real)
+    metrics["overall_rmse"] = float(rmse_real)
+
+    print("MSE log loss:", avg_loss)
+    print("Overall MSE:", mse_real)
+    print("Overall MAE:", mae_real)
+    print("Overall RMSE:", rmse_real)
+
+    logger.report_scalar("metrics", "mse_log_loss", value=float(avg_loss), iteration=0)
+    logger.report_scalar("metrics", "overall_mse", value=float(mse_real), iteration=0)
+    logger.report_scalar("metrics", "overall_mae", value=float(mae_real), iteration=0)
+    logger.report_scalar("metrics", "overall_rmse", value=float(rmse_real), iteration=0)
+
+    # Per-target metrics
+    for i, target in enumerate(target_names):
+        target_y_true = y_true[:, i]
+        target_y_pred = y_pred[:, i]
+
+        target_mse = mean_squared_error(target_y_true, target_y_pred)
+        target_mae = mean_absolute_error(target_y_true, target_y_pred)
+        target_rmse = target_mse ** 0.5
+
+        metrics[f"{target}_mse"] = float(target_mse)
+        metrics[f"{target}_mae"] = float(target_mae)
+        metrics[f"{target}_rmse"] = float(target_rmse)
+
+        print(f"{target} MSE:", target_mse)
+        print(f"{target} MAE:", target_mae)
+        print(f"{target} RMSE:", target_rmse)
+
+        logger.report_scalar("metrics", f"{target}_mse", value=float(target_mse), iteration=0)
+        logger.report_scalar("metrics", f"{target}_mae", value=float(target_mae), iteration=0)
+        logger.report_scalar("metrics", f"{target}_rmse", value=float(target_rmse), iteration=0)
+
+    return metrics

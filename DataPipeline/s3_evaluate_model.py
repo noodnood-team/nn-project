@@ -50,18 +50,21 @@ def main():
     criterion = torch.nn.MSELoss()
     evaluation_result = eval(test_loader, model, criterion, device)
 
+    # Upload all evaluation metrics, including overall metrics and per-target metrics
+    evaluation_artifact = {
+        metric_name: float(metric_value)
+        for metric_name, metric_value in evaluation_result.items()
+    }
+
     task.upload_artifact(
         name="evaluation_result",
-        artifact_object={"mse_log_loss": float(evaluation_result["mse_log_loss"]), 
-                         "mse_real": float(evaluation_result["mse_real"]),
-                         "mae_real": float(evaluation_result["mae_real"]), 
-                         "rmse_real": float(evaluation_result["rmse_real"])}
+        artifact_object=evaluation_artifact
     )
 
-    logger.info(f"MSE (log loss) = {evaluation_result['mse_log_loss']}")
-    logger.info(f"MSE (real) = {evaluation_result['mse_real']}")
-    logger.info(f"MAE = {evaluation_result['mae_real']}")
-    logger.info(f"RMSE = {evaluation_result['rmse_real']}")
+    logger.info("Evaluation metrics:")
+    for metric_name, metric_value in evaluation_artifact.items():
+        logger.info(f"{metric_name} = {metric_value}")
+
     logger.info("s3_evaluate_model completed.")
 
 if __name__ == "__main__":
