@@ -16,8 +16,6 @@ def main():
         project_name='NutritionAnalyser',
         task_name='s2_train_model',
     )
-    # only create the task, we will actually execute it later
-    # task.execute_remotely()
 
     args = {
         "preprocess_task_id": "",

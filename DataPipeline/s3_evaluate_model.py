@@ -11,8 +11,6 @@ def main():
         project_name="NutritionAnalyser",
         task_name="s3_evaluate_model",
     )
-    # only create the task, we will actually execute it later
-    # task.execute_remotely()
 
     logging.basicConfig(level=logging.INFO, force=True)
     logger = logging.getLogger(__name__)
@@ -40,7 +38,8 @@ def main():
     logger.info("Created dataloader for testing.")
 
     # Load model artifact from s2
-    s2_task = Task.get_task(task_id=args["train_task_id"])
+    train_task_id = task.get_parameter("General/train_task_id")
+    s2_task = Task.get_task(task_id=train_task_id)
     model_path = s2_task.artifacts["model"].get_local_copy()
     logger.info(f"Loaded model artifact from: {model_path}")
 
@@ -49,21 +48,18 @@ def main():
     model.to(device)
 
     criterion = torch.nn.MSELoss()
-    val_loss = eval(test_loader, model, criterion, device)
-
-    task.get_logger().report_scalar(
-        "metrics",
-        "val_loss",
-        iteration=0,
-        value=float(val_loss)
-    )
+    evaluation_result = eval(test_loader, model, criterion, device)
 
     task.upload_artifact(
         name="evaluation_result",
-        artifact_object={"val_loss": float(val_loss)}
+        artifact_object={"mse_loss": float(evaluation_result["mse_loss"]), 
+                         "mae": float(evaluation_result["mae"]), 
+                         "rmse": float(evaluation_result["rmse"])}
     )
 
-    logger.info(f"Validation loss = {val_loss}")
+    logger.info(f"MSE = {evaluation_result['mse_loss']}")
+    logger.info(f"MAE = {evaluation_result['mae']}")
+    logger.info(f"RMSE = {evaluation_result['rmse']}")
     logger.info("s3_evaluate_model completed.")
 
 if __name__ == "__main__":

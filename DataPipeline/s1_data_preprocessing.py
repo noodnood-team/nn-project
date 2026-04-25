@@ -13,8 +13,6 @@ def main():
         project_name="NutritionAnalyser",
         task_name="s1_data_preprocessing"
         )
-    # only create the task, we will actually execute it later
-    # task.execute_remotely()
 
     args = {
         "test_size": 0.25,
