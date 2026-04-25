@@ -17,11 +17,11 @@ def main():
         task_name='s2_train_model',
     )
     # only create the task, we will actually execute it later
-    task.execute_remotely()
+    # task.execute_remotely()
 
     args = {
-        "preprocess_task_id": "f1a2fb7e91e348e8910d2bbc32c4d101",
-        'num_epochs': 2,
+        "preprocess_task_id": "",
+        'num_epochs': 20,
         'batch_size': 32,
         'learning_rate': 1e-3,
         'weight_decay': 1e-5

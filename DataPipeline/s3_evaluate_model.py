@@ -12,14 +12,14 @@ def main():
         task_name="s3_evaluate_model",
     )
     # only create the task, we will actually execute it later
-    task.execute_remotely()
+    # task.execute_remotely()
 
     logging.basicConfig(level=logging.INFO, force=True)
     logger = logging.getLogger(__name__)
 
     args = {
-        "preprocess_task_id": "f1a2fb7e91e348e8910d2bbc32c4d101",
-        "train_task_id": "8d49d27f987a47f6afbd0cfecacc4fbd",
+        "preprocess_task_id": "",
+        "train_task_id": "",
         "batch_size": 32
     }
     task.connect(args)

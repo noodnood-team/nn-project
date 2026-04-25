@@ -14,13 +14,13 @@ def main():
         task_name="s1_data_preprocessing"
         )
     # only create the task, we will actually execute it later
-    task.execute_remotely()
+    # task.execute_remotely()
 
     args = {
         "test_size": 0.25,
         "random_state": 42
         }
-
+ 
     task.connect(args)
     logger.info(f"Connected parameters: {args}")
 
